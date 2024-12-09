@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ playlist_name }}</title>
+</head>
+<body>
+    <h1>Playlist: {{ playlist_name }}</h1>
+
+    {% if songs %}
+        <ul>
+            {% for song in songs %}
+                <li>
+                    {{ song }}
+                    <audio controls>
+                        <source src="{{ url_for('static', filename=role + '/' + username + '/' + playlist_name + '/' + song) }}" type="audio/mpeg">
+                        Browser does not support the audio.
+                    </audio>
+
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No songs found in this playlist.</p>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Page</title>
+    <style>
+        * {
+            box-sizing: border-box; /* Ensure padding and borders are included in total width */
+        }
+
+        body {
+            background-color: #4f4f4f; /* Page background color */
+            color: #ffffff; /* Text color */
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        form {
+            background-color: #ffffff; /* Form background */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px; /* Width of the form */
+            max-width: 100%; /* Prevent overflow */
+            margin: 10px 0; /* Space between forms */
+            color: #333; /* Text color inside form */
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50; /* Button color */
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px; /* Space between buttons */
+        }
+
+        button:hover {
+            background-color: #45a049; /* Hover button color */
+        }
+
+        p {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload Music</h1>
+
+    <!-- Form to Create a New Playlist -->
+    <h2>Create New Playlist</h2>
+    <form action="{{ url_for('create_playlist') }}" method="POST">
+        <label for="new_playlist">Playlist Name:</label>
+        <input type="text" id="new_playlist" name="new_playlist" required>
+        <button type="submit">Create Playlist</button>
+    </form>
+
+    <!-- Form to Upload Music to an Existing Playlist -->
+    <h2>Upload to Playlist</h2>
+    <form action="{{ url_for('upload_music') }}" method="POST" enctype="multipart/form-data">
+        <label for="playlist">Select Playlist:</label>
+        <select id="playlist" name="playlist" required>
+            {% for playlist in playlists %}
+                <option value="{{ playlist }}">{{ playlist }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="music_file">Choose an MP3 file:</label>
+        <input type="file" id="music_file" name="music_file" accept=".mp3" required>
+
+        <button type="submit">Upload Music</button>
+    </form>
+</body>
+</html>

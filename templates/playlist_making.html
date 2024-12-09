@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Playlist</title>
+    <style>
+        * {
+            box-sizing: border-box; /* Ensure padding and borders are included in total width */
+        }
+
+        body {
+            background-color: #4f4f4f; /* Page background color */
+            color: #ffffff; /* Text color */
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        form {
+            background-color: #ffffff; /* Form background */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px; /* Width of the form */
+            max-width: 100%; /* Prevent overflow */
+            color: #333; /* Text color inside form */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%; /* Ensure input takes full width of the container */
+            max-width: 100%; /* Prevent overflow */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4CAF50; /* Focus border color */
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50; /* Button color */
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049; /* Hover button color */
+        }
+
+        #suggestions {
+            margin-top: 10px;
+        }
+
+        .suggestion-item {
+            padding: 8px 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .suggestion-item:hover {
+            border-color: #4CAF50; /* Suggestion hover border color */
+            background-color: #e6f3ff; /* Suggestion hover background color */
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>{{ session['uname'] }}'s Profile</h1>
+    </div>
+
+
+    <form id="playlistForm" action="/user/{{ username }}/playlist_making" method="POST" novalidate>
+        <label for="artist">Select Artist:</label>
+        <input type="text" id="artist" name="artist" placeholder="Search for Artists" required>
+        <div id="artistSuggestions" class="autocomplete-suggestions"></div>
+
+        <label for="album">Select Album:</label>
+        <input type="text" id="album" name="album" placeholder="Search for Albums" required>
+        <div id="albumSuggestions" class="autocomplete-suggestions"></div>
+
+        <label for="song">Select Song:</label>
+        <input type="text" id="song" name="song" placeholder="Search for Songs" required>
+        <div id="songSuggestions" class="autocomplete-suggestions"></div>
+
+        <button type="button" id="addSongButton">Add Song</button>
+
+        <h3>Selected Songs:</h3>
+        <ul id="selectedSongs">
+            <!-- List of added songs will appear here -->
+        </ul>
+
+        <label for="playlist_name">New Playlist Name:</label>
+        <input type="text" id="playlist_name" name="playlist_name" placeholder="Enter Playlist Name" required>
+
+        <input type="hidden" id="songs" name="songs"> <!-- Hidden input to store the selected songs -->
+
+        <button type="submit">Create Playlist</button>
+    </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const artistInput = document.getElementById('artist');
+            const albumInput = document.getElementById('album');
+            const songInput = document.getElementById('song');
+            const artistSuggestionsDiv = document.getElementById('artistSuggestions');
+            const albumSuggestionsDiv = document.getElementById('albumSuggestions');
+            const songSuggestionsDiv = document.getElementById('songSuggestions');
+    
+            // For dynamic song selection
+            const selectedSongs = [];
+            const selectedSongsList = document.getElementById('selectedSongs');
+            const songsInput = document.getElementById('songs');
+            const addSongButton = document.getElementById('addSongButton');
+    
+            // Autocomplete for artists
+            artistInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                if (query.length >= 2) {
+                    fetch(`/get_artists?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            artistSuggestionsDiv.innerHTML = '';
+                            data.forEach(artist => {
+                                const div = document.createElement('div');
+                                div.textContent = artist;
+                                div.className = 'suggestion-item';
+                                div.onclick = function() {
+                                    artistInput.value = this.textContent;
+                                    artistSuggestionsDiv.innerHTML = '';
+                                };
+                                artistSuggestionsDiv.appendChild(div);
+                            });
+                        });
+                } else {
+                    artistSuggestionsDiv.innerHTML = '';
+                }
+            });
+    
+            // Autocomplete for albums
+            albumInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                if (query.length >= 2) {
+                    const artist = artistInput.value.trim();
+                    if (!artist) {
+                        alert('Please select an artist first.');
+                        return;
+                    }
+    
+                    fetch(`/get_albums?artist=${encodeURIComponent(artist)}&q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            albumSuggestionsDiv.innerHTML = '';
+                            data.forEach(album => {
+                                const div = document.createElement('div');
+                                div.textContent = album;
+                                div.className = 'suggestion-item';
+                                div.onclick = function() {
+                                    albumInput.value = this.textContent;
+                                    albumSuggestionsDiv.innerHTML = '';
+                                };
+                                albumSuggestionsDiv.appendChild(div);
+                            });
+                        });
+                } else {
+                    albumSuggestionsDiv.innerHTML = '';
+                }
+            });
+    
+            // Autocomplete for songs
+            songInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                if (query.length >= 2) {
+                    const artist = artistInput.value.trim();
+                    const album = albumInput.value.trim();
+                    if (!artist || !album) {
+                        alert('Please select an artist and album first.');
+                        return;
+                    }
+    
+                    fetch(`/get_songs?artist=${encodeURIComponent(artist)}&album=${encodeURIComponent(album)}&q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            songSuggestionsDiv.innerHTML = '';
+                            data.forEach(song => {
+                                const div = document.createElement('div');
+                                div.textContent = song;
+                                div.className = 'suggestion-item';
+                                div.onclick = function() {
+                                    songInput.value = this.textContent;
+                                    songSuggestionsDiv.innerHTML = '';
+                                };
+                                songSuggestionsDiv.appendChild(div);
+                            });
+                        });
+                } else {
+                    songSuggestionsDiv.innerHTML = '';
+                }
+            });
+    
+            // Add song to the playlist
+            addSongButton.addEventListener('click', function() {
+                const song = songInput.value.trim();
+                if (song && !selectedSongs.includes(song)) {
+                    selectedSongs.push(song);
+    
+                    const li = document.createElement('li');
+                    li.textContent = song;
+    
+                    // Add remove functionality
+                    const removeButton = document.createElement('button');
+                    removeButton.textContent = 'Remove';
+                    removeButton.type = 'button';
+                    removeButton.addEventListener('click', function() {
+                        const index = selectedSongs.indexOf(song);
+                        if (index > -1) {
+                            selectedSongs.splice(index, 1);
+                            selectedSongsList.removeChild(li);
+                            updateHiddenInput();
+                        }
+                    });
+                    li.appendChild(removeButton);
+                    selectedSongsList.appendChild(li);
+    
+                    updateHiddenInput();
+                }
+                songInput.value = ''; // Clear the input field
+            });
+    
+            // Update hidden input with selected songs
+            function updateHiddenInput() {
+                songsInput.value = JSON.stringify(selectedSongs);
+            }
+        });
+    </script>
+</body>
+</html>

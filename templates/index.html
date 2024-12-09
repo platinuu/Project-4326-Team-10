@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <style>
+        /* Reset default margin and padding */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Background styling */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #4f4f4f; /* Soft gray background */
+            color: #333;
+        }
+
+        /* Card styling */
+        .card {
+            background-color: #fff;
+            padding: 40px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        /* Heading styling */
+        .card h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Link button styling */
+        .card a {
+            display: inline-block;
+            text-decoration: none;
+            font-weight: bold;
+            color: #fff;
+            background-color: #4CAF50; /* Green button color */
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 10px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Hover effect for buttons */
+        .card a:hover {
+            background-color: #45a049;
+        }
+
+        /* Spacing between links */
+        .card a + a {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>Music</h1>
+        <a href="/login">Log In</a><br>
+        <a href="/add_user">Sign Up</a>
+    </div>
+</body>
+</html>

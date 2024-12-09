@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Page</title>
+    <style>
+        * {
+            box-sizing: border-box; /* Ensure padding and borders are included in total width */
+        }
+
+        body {
+            background-color: #4f4f4f; /* Page background color */
+            color: #ffffff; /* Text color */
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        form {
+            background-color: #ffffff; /* Form background */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px; /* Width of the form */
+            max-width: 100%; /* Prevent overflow */
+            margin: 10px 0; /* Space between forms */
+            color: #333; /* Text color inside form */
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50; /* Button color */
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px; /* Space between buttons */
+        }
+
+        button:hover {
+            background-color: #45a049; /* Hover button color */
+        }
+
+        p {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        
+        <h1>{{ username_display }}'s Profile</h1>
+        <div>
+            {% if is_user %}
+                <img src="{{ url_for('static', filename='users/' + username + '/profile.png') }}" alt="Profile Picture" width="100" height="100"> 
+
+            {% else %}
+                <img src="{{ url_for('static', filename='artists/' + session['username'] + '/profile.png') }}" alt="Profile Picture" width="100" height="100"> 
+            {% endif %}
+            
+        </div>
+
+
+        {% if is_owner %}
+            <form action="{{ url_for('edit_profile', role_type=session['role'], username=session['username']) }}" method="POST">
+                <!-- Form fields for editing profile -->
+                <button type="submit">Edit Profile</button>
+            </form>
+
+            {% if is_creator %}
+                <a href="{{ url_for('upload_music')  }}">
+                    <button type="">Upload Music</button>
+                </a>
+            {% else %}
+                <p></p>
+            {% endif %}
+            {% if is_user %}
+                <a href="/user/{{ username }}/playlist_making">
+                    <button>Create Playlist</button>
+                </a>
+
+            {% else %}
+                <p></p>
+            {% endif %}
+
+
+
+        {% else %}
+            <h1></h1>
+        {% endif %}
+
+        {% if files %}
+            <ul>
+                {% for playlist in files %}
+                    <li>
+                        <a href="{{ url_for('display_playlist', role_type=session['role'], uuid=session['username'], playlist_name=playlist) }}">{{ playlist }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No playlist/albums found</p>
+        {% endif %}
+
+    </div>
+    
+    
+    
+
+
+</body>
+</html>
